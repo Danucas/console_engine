@@ -3,23 +3,44 @@
 #include "englibs.h"
 #include <time.h>
 #include <limits.h>
+#include <stdbool.h>
+#include <pthread.h>
+
+int pressed = 0;
 char **screen(int *dim);
 char **get_pixels(int *dim, int lenght);
 int *read_window();
 void destroy(char **screen, int height);
-void draw(char **screen, char **pixels, int *dim);
-void set_listener();
+int draw(char **screen, char **pixels, int *dim);
+void *set_listener();
+void *set_timer();
 void key_pressed();
+int init(char **screen, char **pixels, int *dim);
 
-void key_pressed()
+int init(char **screen, char **pixels, int *dim)
 {
-  
+  pressed = 0;
+  return (draw(screen, pixels, dim));
 }
 
-void set_listener()
+void *set_listener()
+{
+        int o = system("sudo cp read_input.sh /usr/local/bin/read_input.sh");
+	FILE *key = popen("bash read_input.sh", "r");
+	
+	char keyco[4];
+
+	fgets(keyco, 4, key);
+	pclose(key);
+	//printf("%d", keyco[2]);
+	pressed =  keyco[2];
+	set_listener();
+}
+
+void *set_timer()
 {
  
-  // printf("Timer on:");
+  
   clock_t start, timer;
   unsigned int left = 0;
   unsigned int seconds = 0;
@@ -42,16 +63,25 @@ void set_listener()
 	      // timer = clock();
 	    // milli = timer - start;
 	    // count_down = 1000000;
-	  if (left < 100){
-	    printf("\rTimer: ..");
-	    break;
+	  if (pressed != 0)
+	    {
+	      printf("pressed %d\n", pressed);
+	      pressed = 0;
+	      set_timer();
+	    }
+	  else{
+	  
+	    //	  if (left < 100)
+	    //	    {
+	      printf("\r....................");//   printf(":");
+	      //     	      set_timer();
 	    //	    goto reset;
 	    //	    set_listener();
-	
+	      //	     }
 	  }
 	  
 	}
-      set_listener();
+      
       //      goto reset;
 }
 char **get_pixels(int *dim, int lenght)
@@ -101,10 +131,18 @@ int *read_window()
 	  
 }
 
-void draw(char **screen, char **pixels, int *dim)
+int draw(char **screen, char **pixels, int *dim)
 {
-
+  
   	int clean = system("clear");
+	int offset_up = 3;
+	int o = 0;
+	while (o < offset_up)
+	  {
+	    putchar('\n');
+	    o++;
+	  }
+	printf("\e[37mConsole Engine by Daniel Rodriguez");
 	for (int i = 0; i < dim[1]; i++)
 	  {
 	    for (int j = 0; j < dim[0]; j++)
@@ -115,8 +153,9 @@ void draw(char **screen, char **pixels, int *dim)
 	      }
 	    putchar('\n');
 	  }
-	printf("\nScore 000000================\n");
-	return;
+	printf("Score 000000===============\n");
+	return (0);
+	
 }
 
 void destroy(char **screen, int height)
@@ -155,6 +194,7 @@ char **screen(int *dim)
 	return (lines);
 }
 
+
 int main(int argc, char **av)
 {
 	(void) argc;
@@ -171,20 +211,21 @@ int main(int argc, char **av)
 	char **wind;
 	wind = screen(dimensions);
 	char **pixels = get_pixels(dimensions, 1);
-	draw(wind, pixels, dimensions);
-	int o = system("sudo cp read_input.sh /usr/local/bin/read_input.sh");
-	FILE *key = popen("bash read_input.sh", "r");
-	char keyco[4];
-	fgets(keyco, 4, key);
+	pthread_t thread, t2;
+	int st = init(wind, pixels, dimensions);
 
-	//for (int i = 0; i < 3; i++)
-	int i = 0;
-	while (keyco[i] != '\0')
+	int err, err2;
+	printf("creating threads");
+	err2 = 	pthread_create(&t2, NULL, set_listener, NULL);
+	err = pthread_create(&thread, NULL, set_timer, NULL);
+	if (err | err2)
 	  {
-	    printf("%d", keyco[i]);
-	    i++;
+	    printf("Error\n");    
 	  }
-
-	//	set_listener();
-	return (0);
+	printf("\rThreads created");
+	pthread_join(t2, NULL);
+	pthread_join(thread, NULL);
+	set_listener();
+	//destroy(wind, dimensions[1]);
+	return (st);
 }

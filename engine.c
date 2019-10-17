@@ -5,8 +5,10 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <pthread.h>
-
+char **scn, **pixels;
+int *dimensions;
 int pressed = 0;
+bool press = false;
 char **screen(int *dim);
 char **get_pixels(int *dim, int lenght);
 int *read_window();
@@ -19,7 +21,8 @@ int init(char **screen, char **pixels, int *dim);
 
 int init(char **screen, char **pixels, int *dim)
 {
-  pressed = 0;
+	pressed = 0;
+	press = false;
   return (draw(screen, pixels, dim));
 }
 
@@ -34,6 +37,7 @@ void *set_listener()
 	pclose(key);
 	//printf("%d", keyco[2]);
 	pressed =  keyco[2];
+	press = true;
 	set_listener();
 }
 
@@ -45,7 +49,7 @@ void *set_timer()
   unsigned int left = 0;
   unsigned int seconds = 0;
   unsigned int milli = 0;
-  unsigned int count_down = 10000;
+  unsigned int count_down = 150000;
   unsigned int minutes = 0;
   unsigned int hour = 0;
   start = clock();
@@ -59,26 +63,29 @@ void *set_timer()
 	  minutes = (milli /(CLOCKS_PER_SEC))/60;
 	  hour = minutes/60;
 	  left = count_down - milli;
-	      //start = clock();
-	      // timer = clock();
-	    // milli = timer - start;
-	    // count_down = 1000000;
-	  if (pressed != 0)
-	    {
-	      printf("pressed %d", pressed);
-	      pressed = 0;
-	      set_timer();
-	    }
-	  else{
 	  
-	    //	  if (left < 100)
-	    //	    {
-	      printf("\r....................");//   printf(":");
-	      //     	      set_timer();
-	    //	    goto reset;
-	    //	    set_listener();
-	      //	     }
-	  }
+	   if (left < 100)
+	    {
+		    
+	      printf("\r....................");
+	      if (pressed != 0)
+            {
+              printf("pressed %d", pressed)\
+;
+              //pixels[0][1]+=1 ;
+              press = false;
+              //int d = draw(scn, pixels, d\
+imensions);
+              set_timer();
+            }
+	      else{
+//		    pixels[0][1] += 1;
+	      int g = draw(scn, pixels, dimensions);
+	      set_timer();
+	      }
+	    }
+	      
+	  
 	  
 	}
       
@@ -135,7 +142,7 @@ int draw(char **screen, char **pixels, int *dim)
 {
   
   	int clean = system("clear");
-	int offset_up = 3;
+	int offset_up = 2;
 	int o = 0;
 	while (o < offset_up)
 	  {
@@ -199,7 +206,6 @@ int main(int argc, char **av)
 {
 	(void) argc;
 	
-	int *dimensions;
 	dimensions = read_window();
 	if (dimensions == NULL)
 	  {
@@ -208,11 +214,10 @@ int main(int argc, char **av)
 	  }
 	printf("\e[32mStarting console engine jijiji\e[97m");
 	//set_key_listener();
-	char **wind;
-	wind = screen(dimensions);
-	char **pixels = get_pixels(dimensions, 1);
+	scn = screen(dimensions);
+	pixels = get_pixels(dimensions, 1);
 	pthread_t thread, t2;
-	int st = init(wind, pixels, dimensions);
+	int st = init(scn, pixels, dimensions);
 
 	int err, err2;
 	printf("creating threads");
@@ -225,7 +230,6 @@ int main(int argc, char **av)
 	printf("\rThreads created");
 	pthread_join(t2, NULL);
 	pthread_join(thread, NULL);
-	set_listener();
 	//destroy(wind, dimensions[1]);
 	return (st);
 }

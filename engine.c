@@ -172,12 +172,18 @@ int main(int argc, char **av)
 	wind = screen(dimensions);
 	char **pixels = get_pixels(dimensions, 1);
 	draw(wind, pixels, dimensions);
-	FILE *key = popen("file=$(ls | grep read_input);cp ${file} /bin/bash/${file}", "r");
-	char keyco[100];
-	fgets(keyco, 100, key);
+	int o = system("sudo cp read_input.sh /usr/local/bin/read_input.sh");
+	FILE *key = popen("bash read_input.sh", "r");
+	char keyco[4];
+	fgets(keyco, 4, key);
 
 	//for (int i = 0; i < 3; i++)
-	  printf("%s", keyco);
+	int i = 0;
+	while (keyco[i] != '\0')
+	  {
+	    printf("%d", keyco[i]);
+	    i++;
+	  }
 
 	//	set_listener();
 	return (0);

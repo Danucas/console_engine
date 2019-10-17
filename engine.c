@@ -65,7 +65,7 @@ void *set_timer()
 	    // count_down = 1000000;
 	  if (pressed != 0)
 	    {
-	      printf("pressed %d\n", pressed);
+	      printf("pressed %d", pressed);
 	      pressed = 0;
 	      set_timer();
 	    }

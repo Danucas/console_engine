@@ -1,13 +1,83 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "englibs.h"
-void draw(int width, int height, char **pixels);
-char **screen(int width, int height, char **av);
+#include <time.h>
+#include <limits.h>
+char **screen(int *dim);
+char **get_pixels(int *dim, int lenght);
+int *read_window();
+void destroy(char **screen, int height);
+void draw(char **screen, char **pixels, int *dim);
+void set_listener();
+void key_pressed();
 
-int main(int argc, char **av)
+void key_pressed()
 {
-	(void) argc;
-	FILE *wfile = popen("tput cols", "r");
+  
+}
+
+void set_listener()
+{
+ 
+  // printf("Timer on:");
+  clock_t start, timer;
+  unsigned int left = 0;
+  unsigned int seconds = 0;
+  unsigned int milli = 0;
+  unsigned int count_down = 10000;
+  unsigned int minutes = 0;
+  unsigned int hour = 0;
+  start = clock();
+  left = count_down - milli;
+      while (left > 0)
+	{
+      
+	  timer = clock();
+	  milli = timer - start;
+	  seconds = (milli /(CLOCKS_PER_SEC))-(minutes*60);
+	  minutes = (milli /(CLOCKS_PER_SEC))/60;
+	  hour = minutes/60;
+	  left = count_down - milli;
+	      //start = clock();
+	      // timer = clock();
+	    // milli = timer - start;
+	    // count_down = 1000000;
+	  if (left < 100){
+	    printf("\rTimer: ..");
+	    break;
+	    //	    goto reset;
+	    //	    set_listener();
+	
+	  }
+	  
+	}
+      set_listener();
+      //      goto reset;
+}
+char **get_pixels(int *dim, int lenght)
+{
+  char **pixels = malloc(sizeof(char) * lenght);
+  for (int i = 0; i < lenght; i++)
+    {
+      pixels[i] = malloc(sizeof(char) * 2);
+      if (pixels[i] == NULL)
+	{
+	  for (i-- ; i >=0; i--)
+	    {
+	      free(pixels[i]);
+	    }
+	  free(pixels);
+	  return (NULL);
+
+	}
+      pixels[i][0] = 1;
+      pixels[i][1] = 1;
+    }
+  return(pixels);
+}
+int *read_window()
+{
+        FILE *wfile = popen("tput cols", "r");
 	FILE *hfile = popen("tput lines", "r");
 	char wid[4];
 	char hei[4];
@@ -19,40 +89,56 @@ int main(int argc, char **av)
 	pclose(hfile);
 	width = _atoi(wid);
 	height = _atoi(hei);
-	FILE *tysq;
-	/* drawing screen*/
-	while(1)
-	{
-		char c = getc(stdin);
-		
-			printf("char: %d ", c);
-	}
-	draw(width, height, av);
-	return (0);
+	int *dim = malloc(sizeof(int) * 2);
+	if (dim == NULL)
+	  {
+	    printf("\e[32mError allocating space for dimensions\e[30m");
+	    return(NULL);
+	  }
+	*dim = width - 1;
+	*(dim + 1) = height -4;
+	return (dim);
+	  
 }
-void draw(int width, int height, char **pixels)
+
+void draw(char **screen, char **pixels, int *dim)
 {
-	char **window;
-	window = screen(width - 1, height, pixels);
-        int clean = system("clear");
+
+  	int clean = system("clear");
+	for (int i = 0; i < dim[1]; i++)
+	  {
+	    for (int j = 0; j < dim[0]; j++)
+	      {
+		if (i == pixels[0][0] && j == pixels[0][1])
+		  putchar('*');
+		putchar(screen[i][j]);
+	      }
+	    putchar('\n');
+	  }
+	printf("\nScore 000000================\n");
+	return;
+}
+
+void destroy(char **screen, int height)
+{
         for (int p = 0; p < height; p++)
         {
-                printf("%s\n", window[p]);
-                free(window[p]);
+                printf("%s\n", screen[p]);
+                free(screen[p]);
         }
 
-        free(window);
+        free(screen);
 }
 
-char **screen(int width, int height, char **av)
+char **screen(int *dim)
 {
-	char **lines = malloc(sizeof(char *) * height);
+	char **lines = malloc(sizeof(char *) * dim[1]);
 	//printf("dimensions %d, %d\n", height, width);
 	if(lines == NULL)
 		return (NULL);
-	for (int i = 0; i < height; i++)
+	for (int i = 0; i < dim[1]; i++)
 	{
-		lines[i] = malloc(width * sizeof(char));
+		lines[i] = malloc(dim[0] * sizeof(char));
 		if (lines[i] == NULL)
 		{
 			for(i--; i >= 0; i--)
@@ -61,13 +147,38 @@ char **screen(int width, int height, char **av)
 			}
 			free(lines);
 		}
-		for (int p = 0; p < width; p++)
+		for (int p = 0; p < dim[0]; p++)
 		{
-			if (i == _atoi(av[1]) && p == _atoi(av[2]))
-				lines[i][p] = '*';
-			else
 				lines[i][p] = ' ';
 		}
 	}
 	return (lines);
+}
+
+int main(int argc, char **av)
+{
+	(void) argc;
+	
+	int *dimensions;
+	dimensions = read_window();
+	if (dimensions == NULL)
+	  {
+	    printf("\e[34mError reading console dimensions\e[97m");
+	    return (1);
+	  }
+	printf("\e[32mStarting console engine jijiji\e[97m");
+	//set_key_listener();
+	char **wind;
+	wind = screen(dimensions);
+	char **pixels = get_pixels(dimensions, 1);
+	draw(wind, pixels, dimensions);
+	FILE *key = popen("file=$(ls | grep read_input);cp ${file} /bin/bash/${file}", "r");
+	char keyco[100];
+	fgets(keyco, 100, key);
+
+	//for (int i = 0; i < 3; i++)
+	  printf("%s", keyco);
+
+	//	set_listener();
+	return (0);
 }

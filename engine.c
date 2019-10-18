@@ -28,17 +28,34 @@ int init(char **screen, char **pixels, int *dim)
 
 void *set_listener()
 {
-        int o = system("sudo cp read_input.sh /usr/local/bin/read_input.sh");
-	FILE *key = popen("bash read_input.sh", "r");
-	
-	char keyco[4];
+	system ("/bin/stty raw");
+//        char *c;
+	char c[4];
+	char *pl = "\e[4F";
+	char *nl = "\e[4E";
+        while ((fgets(c, 4, stdin)))
+	{
+		int pos = 0;
+		if (c[2] == 66)
+                        printf("%s", pl);
+                else if(c[2] == 65)
+                        printf("%s", nl);
 
-	fgets(keyco, 4, key);
-	pclose(key);
-	//printf("%d", keyco[2]);
-	pressed =  keyco[2];
-	press = true;
-	set_listener();
+		printf("\rpressed...................");
+		while(c[pos] != '\0')
+		{
+			printf("%d", c[pos]);
+			pos++;
+		}
+	       
+		
+		if(c[0] == 13)
+		{
+			system("/bin/stty cooked");
+			return (NULL);
+		}
+	      
+	}
 }
 
 void *set_timer()
@@ -49,7 +66,7 @@ void *set_timer()
   unsigned int left = 0;
   unsigned int seconds = 0;
   unsigned int milli = 0;
-  unsigned int count_down = 150000;
+  unsigned int count_down = 100;
   unsigned int minutes = 0;
   unsigned int hour = 0;
   start = clock();
@@ -58,38 +75,23 @@ void *set_timer()
 	{
       
 	  timer = clock();
-	  milli = timer - start;
+	  milli = (timer - start) / 100;
 	  seconds = (milli /(CLOCKS_PER_SEC))-(minutes*60);
 	  minutes = (milli /(CLOCKS_PER_SEC))/60;
 	  hour = minutes/60;
 	  left = count_down - milli;
-	  
-	   if (left < 100)
-	    {
-		    
-	      printf("\r....................");
-	      if (pressed != 0)
-            {
-              printf("pressed %d", pressed)\
-;
-              //pixels[0][1]+=1 ;
-              press = false;
-              //int d = draw(scn, pixels, d\
-imensions);
-              set_timer();
-            }
-	      else{
-//		    pixels[0][1] += 1;
-	      int g = draw(scn, pixels, dimensions);
-	      set_timer();
-	      }
-	    }
-	      
-	  
-	  
+	  printf("\rleft: ..%u......%u", left, milli);
+	  //t g = draw(scn, pixels, dimensions)
+	  if (left < 1000 && left > 0)
+	  {
+		  printf("\r..................................pressed: %d", pressed );
+//		  pixels[0][1] += 1;
+//		  int sc = draw(scn, pixels, dimensions);
+		  //printf("\r....................");
+                  //printf("pressed %d", pressed);
+		  set_timer();
+	  }
 	}
-      
-      //      goto reset;
 }
 char **get_pixels(int *dim, int lenght)
 {
@@ -149,18 +151,19 @@ int draw(char **screen, char **pixels, int *dim)
 	    putchar('\n');
 	    o++;
 	  }
-	printf("\e[37mConsole Engine by Daniel Rodriguez");
+	printf("\e[36mConsole Engine by Daniel Rodriguez\e[32m");
 	for (int i = 0; i < dim[1]; i++)
 	  {
 	    for (int j = 0; j < dim[0]; j++)
 	      {
 		if (i == pixels[0][0] && j == pixels[0][1])
-		  putchar('*');
+		  printf("\e[40m \e[49m");
 		putchar(screen[i][j]);
 	      }
 	    putchar('\n');
 	  }
-	printf("Score 000000===============\n");
+	printf("Score 000000===============\n\e[30m");
+	printf("blank space");
 	return (0);
 	
 }
@@ -220,16 +223,16 @@ int main(int argc, char **av)
 	int st = init(scn, pixels, dimensions);
 
 	int err, err2;
-	printf("creating threads");
+	printf("\rcreating threads");
 	err2 = 	pthread_create(&t2, NULL, set_listener, NULL);
-	err = pthread_create(&thread, NULL, set_timer, NULL);
-	if (err | err2)
+//	err = pthread_create(&thread, NULL, set_timer, NULL);
+	if (err2)
 	  {
 	    printf("Error\n");    
 	  }
 	printf("\rThreads created");
 	pthread_join(t2, NULL);
-	pthread_join(thread, NULL);
+//	pthread_join(thread, NULL);
 	//destroy(wind, dimensions[1]);
 	return (st);
 }

@@ -8,7 +8,7 @@
 char **scn, **pixels;
 int *dimensions;
 int pressed = 0;
-bool press = false;
+bool drawing = false;
 char **screen(int *dim);
 char **get_pixels(int *dim, int lenght);
 int *read_window();
@@ -22,26 +22,66 @@ int init(char **screen, char **pixels, int *dim);
 int init(char **screen, char **pixels, int *dim)
 {
 	pressed = 0;
-	press = false;
+	drawing = false;
   return (draw(screen, pixels, dim));
 }
 
 void *set_listener()
 {
 	system ("/bin/stty raw");
-//        char *c;
 	char c[4];
-	char *pl = "\e[4F";
-	char *nl = "\e[4E";
+	char *width = _tostring(dimensions[0]);
+	char *height = _tostring(dimensions[1] + 4);
+	int size, i, j;
+	size = _strlen(height) + 5; 
+	char *index;
+	index = malloc(size * sizeof(char)); 
+	index[0] = '\e';
+	index[1] = '[';
+	i = 2;
+	j = 0;
+	while (height[j] != '\0')
+	{
+		index[i] = height[j];
+		i++;
+		j++;
+	}
+	index[i] = ';';
+	i++;
+	index[i] = '0';
+	i++;
+	index[i] = 'H';
+	index[i+1] = '\0';
         while ((fgets(c, 4, stdin)))
 	{
+		drawing = true;
 		int pos = 0;
-		if (c[2] == 66)
-                        printf("%s", pl);
-                else if(c[2] == 65)
-                        printf("%s", nl);
+		system("/bin/stty cooked");
+		printf("%s", index);
+//		if (c[2] == 66)
+//                      printf("up");
+		//              else if(c[2] == 65)
+		//      printf("down");
+		//
+		// printf("\rpressed...");
+		if (c[2] == 65)    /* UP */
+		{
+			pixels[0][1] -= 1;
+		}
+		else if(c[2] == 66)    /* DOWN */
+		{
+			pixels[0][1] += 1; 
+		}
+		else if (c[2] == 67)     /* RIGHT */
+		{
+			pixels[0][0] += 1;
+		}
+		else if (c[2] == 68)    /* LEFT */
+		{
+			pixels[0][0] -= 1;
+		}
 
-		printf("\rpressed...................");
+		int n =	draw(scn, pixels, dimensions);
 		while(c[pos] != '\0')
 		{
 			printf("%d", c[pos]);
@@ -54,13 +94,15 @@ void *set_listener()
 			system("/bin/stty cooked");
 			return (NULL);
 		}
+		else
+			system("/bin/stty raw");
 	      
 	}
 }
 
 void *set_timer()
 {
- 
+	if(!drawing){
   
   clock_t start, timer;
   unsigned int left = 0;
@@ -91,6 +133,7 @@ void *set_timer()
                   //printf("pressed %d", pressed);
 		  set_timer();
 	  }
+	}
 	}
 }
 char **get_pixels(int *dim, int lenght)
@@ -143,12 +186,12 @@ int *read_window()
 int draw(char **screen, char **pixels, int *dim)
 {
   
-  	int clean = system("clear");
+  	printf("\e[0;0H");
 	int offset_up = 2;
 	int o = 0;
 	while (o < offset_up)
 	  {
-	    putchar('\n');
+		  // putchar('\n');
 	    o++;
 	  }
 	printf("\e[36mConsole Engine by Daniel Rodriguez\e[32m");
@@ -156,14 +199,20 @@ int draw(char **screen, char **pixels, int *dim)
 	  {
 	    for (int j = 0; j < dim[0]; j++)
 	      {
-		if (i == pixels[0][0] && j == pixels[0][1])
-		  printf("\e[40m \e[49m");
-		putchar(screen[i][j]);
+		if (i == pixels[0][1] && j == pixels[0][0])
+		{
+		  printf("*");
+		}
+		else
+		{
+			printf(" ");
+		}
+//putchar(screen[i][j]);
 	      }
 	    putchar('\n');
 	  }
 	printf("Score 000000===============\n\e[30m");
-	printf("blank space");
+	printf("....");
 	return (0);
 	
 }
@@ -208,14 +257,14 @@ char **screen(int *dim)
 int main(int argc, char **av)
 {
 	(void) argc;
-	
+	system("clear");
 	dimensions = read_window();
 	if (dimensions == NULL)
 	  {
 	    printf("\e[34mError reading console dimensions\e[97m");
 	    return (1);
 	  }
-	printf("\e[32mStarting console engine jijiji\e[97m");
+//	printf("\e[32mStarting console engine jijiji\e[97m");
 	//set_key_listener();
 	scn = screen(dimensions);
 	pixels = get_pixels(dimensions, 1);
@@ -223,14 +272,14 @@ int main(int argc, char **av)
 	int st = init(scn, pixels, dimensions);
 
 	int err, err2;
-	printf("\rcreating threads");
+//	printf("\rcreating threads");
 	err2 = 	pthread_create(&t2, NULL, set_listener, NULL);
 //	err = pthread_create(&thread, NULL, set_timer, NULL);
 	if (err2)
 	  {
 	    printf("Error\n");    
 	  }
-	printf("\rThreads created");
+//	printf("\rThreads created");
 	pthread_join(t2, NULL);
 //	pthread_join(thread, NULL);
 	//destroy(wind, dimensions[1]);

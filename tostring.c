@@ -3,7 +3,6 @@
 
 char *_tostring(int n)
 {
-//	printf("int: %d  :::::\e[32m", n);
 	int factor = 1, i, j, res = n;
 	char *ch;
 	res /= 10;
@@ -12,7 +11,8 @@ char *_tostring(int n)
 		factor *= 10;
 		res /= 10;
 	}
-	ch = malloc((i + 2) * sizeof(char));
+//	printf("%d\n", i + 1);
+	ch = malloc((i + 1) * sizeof(char));
 	if (ch == NULL)
 		return (NULL);
 	for( j = 1; j <= i; j++)
@@ -41,7 +41,7 @@ char *_tostring(int n)
 			ch[j -1] =  '0' + res;
 		}
 	}
-	ch[j - 1] = '\0';
+	ch[i] = '\0';
+//	printf("%d", ch[i - 1]);
 	return(ch);
 }
-

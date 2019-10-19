@@ -16,6 +16,7 @@ char **screen(int *dim)
                                 free(lines[i]);
                         }
                         free(lines);
+			return (NULL);
                 }
                 for (int p = 0; p < dim[0]; p++)
                 {

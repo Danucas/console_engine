@@ -4,7 +4,9 @@
 
 char **get_pixels(int *dim, int lenght)
 {
-  char **pixels = malloc(sizeof(char) * lenght);
+  char **pixels = malloc(sizeof(char*) * lenght);
+  if (pixels == NULL)
+	  return (NULL);
   for (int i = 0; i < lenght; i++)
     {
       pixels[i] = malloc(sizeof(char) * 2);

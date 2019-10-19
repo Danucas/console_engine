@@ -1,0 +1,6 @@
+#!/bin/bash
+echo -e "xterm*font: *-fixed-*-*-*-6-*\nXTerm*geometry: 160x92" > ~/.Xresources
+xrdb -merge ~/.Xresources
+echo "initializing game"
+cp run_engine /bin/run_engine
+xterm -hold -e run_engine

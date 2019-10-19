@@ -1,0 +1,6 @@
+#!/bin/bash
+echo -e "xterm*font: *-fixed-*-*-*-6-*\nXTerm*geometry: 160x92" > ~/.Xresources
+xrdb -merge ~/.Xresources
+echo ""
+sudo cp run_engine /usr/local/bin/run_engine
+xterm -hold -e run_engine

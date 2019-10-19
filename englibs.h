@@ -9,14 +9,13 @@ int _strlen(char *s);
 int *read_window(void);
 char **screen(int *dim);
 char **get_pixels(int *dim, int lenght);
-void destroy(char **screen, int height);
 int draw(char **screen, char **pixels, int *dim);
 void *set_listener();
 void *set_timer();
 char ***_obj(int n);
 int obj_trans(char **ob, int code);
 char *mov_coord(char *x, char *y);
-
+int delay(int del);
 extern char **pixels;
 extern char **scn;
 

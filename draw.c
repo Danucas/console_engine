@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include "englibs.h"
+
+extern char **pixels;
+
+
 int draw(char **screen, char **pixels, int *dim)
 {
  	printf("\e[0;0H");

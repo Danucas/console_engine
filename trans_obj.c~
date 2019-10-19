@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include "englibs.h"
+extern int *dimensions;
+void youlose();
+void tick();
+int obj_trans(char **ob, int code)
+{
+	char *x;
+	x = &ob[0][0];
+	char *y;
+	y = &ob[0][1];
+	if (code == 65)    /* UP */
+                {
+			if (*y > 0)
+			{
+			       *y -= 1;
+			       tick();
+			}
+			else
+				youlose();
+                }
+                else if(code == 66)    /* DOWN */
+                {
+			if (*y  < (dimensions[1] - 1))
+			{
+				*y += 1;
+				tick();
+			}
+			else
+				youlose();
+                }
+                else if (code == 67)     /* RIGHT */
+                {
+			if (*x  <  (dimensions[0] - 1))
+			{
+				*x += 1;
+				tick();
+			}
+			else
+				youlose();
+                }
+                else if (code == 68)    /* LEFT */
+                {
+			if (*x > 0)
+			{
+				*x -= 1;
+				tick();
+			}
+			else
+				youlose();
+                }
+
+	return (0);
+}
+
+void youlose()
+{
+	printf("%s\e[31m Game over  \e[0m", mov_coord(_tostring((dimensions[0] / 2) - 6), _tostring(dimensions[1] + 3)));
+}
+void tick()
+{
+	printf("%s\e[37mkeep playing\e[0m", mov_coord(_tostring((dimensions[0] / 2) - 6), _tostring(dimensions[1] + 3)));
+}

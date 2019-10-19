@@ -1,0 +1,3 @@
+#!/bin/bash
+echo -e "\e[36mCompiling started\e[39m"
+gcc -pthread engine.c tostring.c todig.c strlen.c read_window.c draw.c get_pixels.c screen.c set_listener.c get_obj.c trans_obj.c coord.c -o p

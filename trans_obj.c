@@ -31,9 +31,9 @@ int obj_trans(char **ob, int code)
                 }
                 else if (code == 67)     /* RIGHT */
                 {
-			if (*x + 1 <  (dimensions[0] - 1))
+			if (*x + 2 <  (dimensions[0] - 1))
 			{
-				*x += 1;
+				*x += 2;
 				tick();
 			}
 			else
@@ -43,7 +43,9 @@ int obj_trans(char **ob, int code)
                 {
 			if (*x > 0)
 			{
-				*x -= 1;
+				if (*x == 1)
+					*x -= 1;
+				*x -= 2;
 				tick();
 			}
 			else

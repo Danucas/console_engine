@@ -9,7 +9,7 @@
 int init(char **screen, char **pixels, int *dim);
 
 int *dimensions;
-
+bool stop = false;
 char **scn, **pixels;
 char ***obj;
 int init(char **screen, char **pixels, int *dim)
@@ -31,11 +31,10 @@ int destroy(char **screen, int height)
 int main(int argc, char **av)
 {
 	(void) argc;
-	printf("\e[8;36;72t");
-	printf("\e[15;20Hiniciando");
+	printf("\e[8;36;73t");
 	system("clear");
 
-//	int t = delay(3);
+	int t = delay(3);
 	dimensions = read_window();
 	if (dimensions == NULL)
 	  {
@@ -52,15 +51,15 @@ int main(int argc, char **av)
 	if (pixels == NULL)
 		return (0);
 	obj[0] = pixels;
-	pthread_t t2;
+	pthread_t t2, screen_animation;
 	int st = init(scn, pixels, dimensions);
 //	printf("\n\n\ndibujado\n");
-	int err2;
+	int err2, err;
 
 //	void *listener = set_listener();
 
 	err2 = 	pthread_create(&t2, NULL, set_listener, NULL);
-
+	err  = pthread_create(&screen_animation, NULL, set_timer, NULL);
 	if (err2)
 	{
 	    printf("Error\n");
@@ -68,6 +67,7 @@ int main(int argc, char **av)
 //	printf("\n\n\ncerrando la cosa\n");
 //	if (err2 != NULL)
 	pthread_join(t2, NULL);
+	pthread_join(screen_animation, NULL);
 //	printf("\n\n\n%ldalgo paso\n", t2);
 	
 	system("clear");

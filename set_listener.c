@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include "englibs.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 extern int *dimensions;
 extern char ***obj;
-
+extern bool stop;
 void *set_listener()
 {
         system ("/bin/stty raw");
@@ -32,6 +33,7 @@ void *set_listener()
 		printf("%d  ", c[0]);
                 if(c[0] == 122)
                 {
+			stop = true;
                         system("/bin/stty cooked");
 			free(code_display);
 			return(NULL);

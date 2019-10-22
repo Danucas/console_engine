@@ -1,11 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "englibs.h"
-
+#include <stdbool.h>
 extern char **pixels;
-
+extern bool drawing;
 
 int draw(char **screen, char **pixels, int *dim)
 {
+	if (!drawing)
+	{
+		drawing = true;
  	printf("\e[0;0H");
 	int offset_up = 2;
         int o = 0;
@@ -20,7 +24,7 @@ int draw(char **screen, char **pixels, int *dim)
               {
                	if (i == pixels[0][1] && j == pixels[0][0])
 		{
-                  printf("\e[40m  \e[47m");
+                  printf("0");
 		  j++;
 		}
                 else
@@ -30,6 +34,8 @@ int draw(char **screen, char **pixels, int *dim)
               }
             putchar('\n');
           }
-        printf("\e[0mScore 00000\n\e[32m");
+        printf("\e[0mScore 00000\e[32m");
+	drawing = false;
+	}
         return (0);
 }

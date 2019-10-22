@@ -10,6 +10,7 @@ int init(char **screen, char **pixels, int *dim);
 
 int *dimensions;
 bool stop = false;
+bool drawing = false;
 char **scn, **pixels;
 char ***obj;
 int init(char **screen, char **pixels, int *dim)
@@ -31,8 +32,8 @@ int destroy(char **screen, int height)
 int main(int argc, char **av)
 {
 	(void) argc;
-	printf("\e[8;36;73t");
-	system("clear");
+	//printf("\e[8;36;73t");
+	printf("\n\n\n");
 
 	int t = delay(3);
 	dimensions = read_window();

@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include "englibs.h"
 extern int *dimensions;
+extern bool drawing;
 void youlose();
 void tick();
 void print_coords(char *x, char *y);
@@ -32,9 +34,9 @@ int obj_trans(char **ob, int code)
                 }
                 else if (code == 67)     /* RIGHT */
                 {
-			if (*x + 2 <  (dimensions[0] - 1))
+			if (*x + 1 <  (dimensions[0] - 1))
 			{
-				*x += 2;
+				*x += 1;
 				print_coords(x, y);
 			}
 			else
@@ -44,9 +46,7 @@ int obj_trans(char **ob, int code)
                 {
 			if (*x > 0)
 			{
-				if (*x == 1)
-					*x -= 1;
-				*x -= 2;
+				*x -= 1;
 				print_coords(x, y);
 			}
 			else
@@ -58,6 +58,7 @@ int obj_trans(char **ob, int code)
 
 void print_coords(char *x, char *y)
 {
+	if (!drawing)
 	printf("%s\e[37mCoords: x: %d, y: %d\e[0m", mov_coord(_tostring((dimensions[0] / 2) - 12), _tostring(dimensions[1] + 3)), *x, *y);
 }
 
